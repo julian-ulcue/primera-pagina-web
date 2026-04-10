@@ -13,7 +13,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { overflow: hidden; background-color: #000; font-family: 'Montserrat', sans-serif; }
 
-        /* Pantalla de Intro */
+        /* Pantalla de Intro (Videos secuenciales) */
         #intro-screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100vh;
@@ -29,6 +29,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            /* Ajuste opcional para PC: max-width: 600px; border-radius: 12px; */
         }
 
         /* Botón de retroceso */
@@ -44,8 +45,15 @@
             font-weight: bold;
         }
 
-        /* Ocultar el botón de escaneo VR que a veces sale por defecto */
         .a-enter-vr { display: none !important; }
+
+        /* Ajuste responsive para el video de intro en celular */
+        @media screen and (max-width: 768px) {
+            #intro-video {
+                max-width: none;
+                border-radius: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -64,18 +72,13 @@
         device-orientation-permission-ui="enabled: false">
         
         <a-assets>
-            <video id="ar-vid1" src="ra/realidad aumentada_niño_rayuela_final.mp4" loop crossorigin="anonymous" playsinline webkit-playsinline></video>
-            <video id="ar-vid2" src="video/reflexion.mp4" loop crossorigin="anonymous" playsinline webkit-playsinline></video>
+            <video id="ar-vid1" src="ra/realidad_aumentada_final.mp4" loop crossorigin="anonymous" playsinline webkit-playsinline></video>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0" id="target1">
             <a-plane position="0 0 0" scale="1.5 1 1" material="shader: chromakey; src: #ar-vid1; color: 0.1 0.9 0.2;"></a-plane>
-        </a-entity>
-
-        <a-entity mindar-image-target="targetIndex: 1" id="target2">
-            <a-plane position="0 0 0" scale="1.5 1 1" material="shader: chromakey; src: #ar-vid2; color: 0.1 0.9 0.2;"></a-plane>
         </a-entity>
 
     </a-scene>
@@ -87,34 +90,34 @@
             
             const target1 = document.getElementById('target1');
             const vid1 = document.getElementById('ar-vid1');
-            
-            const target2 = document.getElementById('target2');
-            const vid2 = document.getElementById('ar-vid2');
 
             // ==========================================
             // LÓGICA DE TRANSICIÓN (2 Videos de Intro)
             // ==========================================
             
-            // 🚨 ¡MODIFICA ESTA LÍNEA CON EL NOMBRE DE TU SEGUNDO VIDEO! 🚨
-            const SEGUNDO_VIDEO = "video/tutorial_RA.mp4"; // <--- Cambia aquí al nombre de tu segundo video
+            // Define el segundo video que se reproducirá (tutorial)
+            const SEGUNDO_VIDEO = "video/tutorial_RA.mp4"; 
             
             let faseIntro = 1; // Controla en qué video vamos
 
             if(introVideo) {
+                // Cuando termina el video actual...
                 introVideo.addEventListener('ended', function() {
                     
                     if (faseIntro === 1) {
-                        // Terminó el primer video. Cambiamos al segundo.
+                        // Terminó el primer video (carga). Cambiamos la fuente al segundo (tutorial).
                         introVideo.src = SEGUNDO_VIDEO;
-                        introVideo.play();
+                        introVideo.play(); // Reproducir el segundo video
                         faseIntro = 2; // Actualizamos la fase
                     } 
                     else if (faseIntro === 2) {
-                        // Terminó el segundo video. Quitamos la pantalla verde y mostramos la AR.
+                        // Terminó el segundo video (tutorial).
+                        // Ocultamos la pantalla de intro con una transición de opacidad.
                         introScreen.style.opacity = '0'; 
                         setTimeout(() => {
+                            // Eliminamos el elemento del diseño para mostrar la cámara AR.
                             introScreen.style.display = 'none'; 
-                        }, 500);
+                        }, 500); // Duración de la transición CSS
                     }
                     
                 });
@@ -124,33 +127,23 @@
             // LÓGICA DE REALIDAD AUMENTADA (MindAR)
             // ==========================================
             
-            // Tarjeta 1
+            // Eventos para la Tarjeta 1
             if(target1 && vid1) {
+                // Cuando la cámara encuentra la tarjeta...
                 target1.addEventListener('targetFound', function() {
-                    vid1.play();
+                    vid1.play(); // Reproducir el video de la rayuela
                 });
+                // Cuando la cámara pierde la tarjeta...
                 target1.addEventListener('targetLost', function() {
-                    vid1.pause();
-                    vid1.currentTime = 0; 
+                    vid1.pause(); // Pausar el video
+                    vid1.currentTime = 0; // Reiniciar el video al principio
                 });
             }
 
-            // Tarjeta 2
-            if(target2 && vid2) {
-                target2.addEventListener('targetFound', function() {
-                    vid2.play();
-                });
-                target2.addEventListener('targetLost', function() {
-                    vid2.pause();
-                    vid2.currentTime = 0;
-                });
-            }
-
-            // Solución para móviles (desbloquear audio/video al tocar)
+            // Solución para móviles (desbloquear el video al primer toque)
             window.addEventListener('touchstart', function() {
                 if(vid1) { vid1.play(); vid1.pause(); }
-                if(vid2) { vid2.play(); vid2.pause(); }
-            }, { once: true });
+            }, { once: true }); // Solo se ejecuta una vez
         });
     </script>
 </body>
