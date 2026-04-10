@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gigs - Juegos</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           IMPORTACIÓN DE FUENTE PERSONALIZADA (NEULIS)
+           ========================================= */
+        @font-face {
+            font-family: 'Neulis';
+            src: url('fonts/Neulis-SemiBold.otf') format('opentype');
+            font-weight: 600; /* 600 es el valor correcto para SemiBold */
+            font-style: normal;
+        }
+
+        /* =========================================
+           CONFIGURACIÓN BASE
+           ========================================= */
+        :root {
+            --color-verde: #d1ff7a;
+            --fuente-principal: 'Montserrat', sans-serif;
+            --fuente-titulos: 'Neulis', sans-serif; 
+            --color-texto: #000;
+            
+            /* Colores actualizados para los 4 bloques */
+            --color-cyan: #5bc0de; 
+            --color-pink: #e066c6; 
+            --color-orange: #f0ad4e;     
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--fuente-principal); color: var(--color-texto); overflow-x: hidden; background-color: #f8f8f8; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* =========================================
+           1. HEADER
+           ========================================= */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background-color: #55c0e2; }
+        .header-logo { display: flex; align-items: center; font-weight: 800; font-size: 1.5rem; text-decoration: none; color: #000; }
+        .header-logo img { width: 35px; margin-right: 10px; }
+        .header-nav { display: flex; gap: 0; }
+        .header-nav a { color: #ffffff; text-decoration: none; padding: 8px 15px; font-weight: 700; font-size: 0.9rem; transition: all 0.3s; border-right: 2px solid #ffffff; display: flex; align-items: center; justify-content: center; }
+        .header-nav a:last-child { border-right: none; }
+        .header-nav a:active { background: linear-gradient(135deg, #55c0e2 0%, #ffffff 100%); color: #000; }
+
+        /* =========================================
+           2. TÍTULO
+           ========================================= */
+        .section-title-container { text-align: center; padding: 40px 5% 10px; }
+        .section-title { 
+            font-family: var(--fuente-titulos); 
+            font-weight: 600; 
+            font-size: 2.5rem; 
+            color: #55c0e2; 
+            /* Se eliminó text-transform para respetar minúsculas */
+        }
+
+        /* =========================================
+           3. CONTENEDOR PRINCIPAL INTERACTIVO
+           ========================================= */
+        .interactive-container {
+            flex: 1; display: grid; grid-template-columns: 1fr 300px 1fr; gap: 20px; padding: 20px 5% 60px; max-width: 1300px; margin: 0 auto; width: 100%; align-items: start;
+            position: relative; font-family: Neulis, sans-serif; /* Fuente personalizada para el contenido principal */
+        }
+
+        /* --- MAPA CENTRAL (4 BLOQUES) --- */
+        .map-column { display: flex; flex-direction: column; width: 100%; position: relative; }
+        .map-label { text-align: center; font-weight: 800; font-family: var(--fuente-titulos); text-transform: uppercase; font-size: 1.2rem; padding: 10px 0; color: #333; }
+
+        .game-block { width: 100%; height: 160px; display: flex; align-items: center; color: #000; font-weight: 700; font-size: 1.2rem; cursor: pointer; position: relative; transition: transform 0.2s, filter 0.2s; margin-bottom: -1px; }
+        .game-block:hover { filter: brightness(1.1); }
+        .game-block.active { transform: scale(1.05); z-index: 10; box-shadow: 0 0 20px rgba(0,0,0,0.3); }
+
+        /* Formas matemáticas exactas para el diseño de 4 bloques */
+        #bloque-rayuela { 
+            background-color: var(--color-cyan); 
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 50%); 
+            justify-content: center; 
+            padding-bottom: 20px; /* Sube el texto para centrarlo */
+        }
+        #bloque-triki { 
+            background-color: var(--color-pink); 
+            clip-path: polygon(0 0, 100% 50%, 0 100%); 
+            margin-top: -80px; 
+            justify-content: flex-start; 
+            padding-left: 15%; 
+        }
+        #bloque-jenga { 
+            background-color: var(--color-orange); 
+            clip-path: polygon(0 50%, 100% 0, 100% 100%); 
+            margin-top: -80px; 
+            justify-content: flex-end; 
+            padding-right: 15%; 
+        }
+        #bloque-rompecabezas { 
+            background-color: var(--color-cyan); 
+            clip-path: polygon(0 0, 100% 50%, 100% 100%, 0 100%); 
+            margin-top: -80px; 
+            height: 140px; 
+            justify-content: center;
+            align-items: flex-end; 
+            padding-bottom: 30px; 
+        }
+
+        /* --- COLUMNAS LATERALES (PC) --- */
+        .info-column { position: relative; width: 100%; min-height: 400px; display: flex; align-items: center; }
+
+        .info-card {
+            background-color: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 30px; width: 100%;
+            opacity: 0; visibility: hidden; transform: scaleX(0); transform-origin: center; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: absolute; z-index: 20;
+        }
+
+        .info-card.show { opacity: 1; visibility: visible; transform: scaleX(1); }
+        .info-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 20px; background-color: #eee; }
+        
+        .info-card h3 { 
+            font-family: var(--fuente-titulos); 
+            font-weight: 600;
+            font-size: 1.8rem; 
+            color: #55c0e2; 
+            margin-bottom: 10px; 
+        }
+        .info-card p { font-size: 0.95rem; line-height: 1.5; color: #555; margin-bottom: 10px; }
+        
+        .close-card { display: none; } 
+
+        /* =========================================
+           4. FOOTER
+           ========================================= */
+        footer { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: start; padding: 40px 5%; background-color: #55c0e2; gap: 20px; }
+        .footer-logo { display: flex; align-items: center; font-weight: 800; font-size: 0.9rem; text-decoration: none; color: #ffffff; padding-right: 40px; }
+        .footer-logo img { width: 30px; margin-right: 10px; }
+        .footer-nav { list-style: none; display: flex; flex-direction: column; gap: 10px; padding: 0 40px; }
+        .footer-nav a { text-decoration: none; color: #ffffff; font-weight: 700; font-size: 0.9rem; }
+        .footer-nav a:hover { opacity: 0.7; }
+        .footer-text { font-size: 0.9rem; text-align: right; align-self: center; color: #ffffff; }
+
+        /* =========================================
+           RESPONSIVE (MÓVILES)
+           ========================================= */
+        @media screen and (max-width: 900px) {
+            header { flex-direction: column; gap: 15px; }
+            .header-nav { flex-wrap: wrap; justify-content: center; }
+            .header-nav a { font-size: 0.8rem; padding: 6px 10px; }
+            
+            .section-title { font-size: 1.6rem; }
+            .interactive-container { grid-template-columns: 1fr; gap: 5px; padding: 10px 5% 10px; }
+            .info-column { display: none; }
+
+            .map-column { max-width: 200px; margin: 0 auto; }
+            .map-label { font-size: 0.85rem; padding: 5px 0; }
+            .game-block { font-size: 0.9rem; height: 100px !important; }
+            
+            /* Ajustes proporcionales para móvil (4 bloques) */
+            #bloque-rayuela { padding-bottom: 10px; }
+            #bloque-triki { margin-top: -50px; padding-left: 10%; }
+            #bloque-jenga { margin-top: -50px; padding-right: 10%; }
+            #bloque-rompecabezas { height: 90px !important; margin-top: -50px; padding-bottom: 15px; }
+
+            #mobile-card-container { 
+                display: flex; 
+                position: absolute; 
+                top: 50%; 
+                left: 50%; 
+                transform: translate(-50%, -50%); 
+                width: 90%; 
+                max-width: 320px;
+                z-index: 100; 
+                pointer-events: none; 
+            }
+
+            .info-card {
+                pointer-events: auto; 
+                transform-origin: center !important; 
+                transform: scale(0); 
+                padding: 15px; 
+                border-radius: 12px;
+                display: flex; 
+                align-items: center;
+                gap: 15px; 
+                box-shadow: 0 15px 40px rgba(0,0,0,0.4); 
+                background-color: rgba(255, 255, 255, 0.95); 
+            }
+            .info-card.show { transform: scale(1); }
+            
+            .info-card img { width: 70px; height: 70px; margin-bottom: 0; flex-shrink: 0; border-radius: 6px; } 
+            .card-text-container { display: flex; flex-direction: column; padding-right: 15px; }
+            .info-card h3 { font-size: 1.1rem; margin-bottom: 5px; }
+            .info-card p { font-size: 0.8rem; margin-bottom: 0; line-height: 1.3; }
+
+            .close-card {
+                display: block; position: absolute; top: 5px; right: 10px; font-size: 1.5rem; font-weight: bold; color: #aaa; cursor: pointer; line-height: 1;
+            }
+            .close-card:active { color: #000; }
+
+            footer { grid-template-columns: 1fr; text-align: center; gap: 30px; }
+            .footer-logo { justify-content: center; padding-right: 0; }
+            .footer-nav { padding: 0; align-items: center; }
+            .footer-text { text-align: center; }
+        }
+
+        @media screen and (min-width: 901px) {
+            #mobile-card-container { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="header-logo">
+            <img src="icon/icono3.ico" alt="Logo"> 
+        </a>
+        <nav class="header-nav">
+            <a href="index.html">Inicio</a>
+            <a href="ra.html">Realidad Aumentada</a>
+            <a href="nosotros.html">Nosotros</a>
+        </nav>
+    </header>
+
+    <div class="section-title-container">
+        <h2 class="section-title">Explora lo que aún vive en ti</h2>
+    </div>
+
+    <section class="interactive-container">
+        
+        <div class="info-column" id="col-izq"></div>
+
+        <div class="map-column">
+            <div class="map-label">Entrada</div>
+
+            <div class="game-block" id="bloque-rayuela" data-game="rayuela" data-side="izq">Rayuela</div>
+            <div class="game-block" id="bloque-triki" data-game="triki" data-side="der">Triqui</div>
+            <div class="game-block" id="bloque-jenga" data-game="jenga" data-side="izq">Torre de equilibrio</div>
+            <div class="game-block" id="bloque-rompecabezas" data-game="rompecabezas" data-side="der">Rompecabezas</div>
+
+            <div class="map-label">Salida</div>
+        </div>
+
+        <div class="info-column" id="col-der"></div>
+
+        <div id="mobile-card-container"></div>
+
+    </section>
+
+    <footer>
+        <a href="index.html" class="footer-logo"><img src="icon/icono3.ico" alt="Logo"></a>
+        <ul class="footer-nav">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="ra.html">Realidad Aumentada</a></li>
+            <li><a href="juegos.html">Juegos</a></li>
+            <li><a href="nosotros.html">Nosotros</a></li>
+        </ul>
+        <div class="footer-text">
+            <p>© 2026 - Caja de los recuerdos</p>
+        </div>
+    </footer>
+
+    <script>
+        const datosJuegos = {
+            'rayuela': {
+                titulo: 'Rayuela',
+                descripcion: 'La rayuela invita al movimiento inmediato, permitiendo que el cuerpo entre en acción y facilite una transición hacia la participación activa',
+                imagen: 'omg/tarjeta3.png'
+            },
+            'triki': {
+                titulo: 'Triqui',
+                descripcion: 'El triki genera un espacio de pausa activa donde el usuario reorganiza su atención a través de una dinámica simple de decisión y estrategia',
+                imagen: 'omg/tarjeta.png'
+            },
+            'jenga': {
+                titulo: 'Torre de Equilibrio',
+                descripcion: 'Espacio que exige precisión, control y presencia. Cada acción tiene una consecuencia inmediata, llevando al usuario a concentrarse completamente.',
+                imagen: 'omg/tarjeta1.png'
+            },
+            'rompecabezas': {
+                titulo: 'Rompecabezas',
+                descripcion: 'Espacio más íntimo y pausado que invita a desacelerar. La construcción progresiva permite organizar la experiencia vivida',
+                imagen: 'omg/tarjeta2.png'
+            }
+        };
+
+        const bloques = document.querySelectorAll('.game-block');
+        const colIzq = document.getElementById('col-izq');
+        const colDer = document.getElementById('col-der');
+        const colMovil = document.getElementById('mobile-card-container');
+
+        function crearHTMLTarjeta(juego) {
+            return `
+                <div class="info-card" id="tarjeta-activa">
+                    <span class="close-card" id="btn-cerrar-tarjeta">&times;</span>
+                    <img src="${juego.imagen}" alt="${juego.titulo}" onerror="this.src='https://via.placeholder.com/150?text=${juego.titulo}'">
+                    <div class="card-text-container">
+                        <h3>${juego.titulo}</h3>
+                        <p>${juego.descripcion}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        bloques.forEach(bloque => {
+            bloque.addEventListener('click', function() {
+                const idJuego = this.getAttribute('data-game');
+                const ladoAsignado = this.getAttribute('data-side'); 
+                const datos = datosJuegos[idJuego];
+
+                bloques.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const esMovil = window.innerWidth <= 900;
+                
+                colIzq.innerHTML = '';
+                colDer.innerHTML = '';
+                colMovil.innerHTML = '';
+
+                let contenedorDestino = esMovil ? colMovil : (ladoAsignado === 'izq' ? colIzq : colDer);
+                
+                contenedorDestino.innerHTML = crearHTMLTarjeta(datos);
+                const nuevaTarjeta = document.getElementById('tarjeta-activa');
+
+                if (!esMovil) {
+                    nuevaTarjeta.style.transformOrigin = ladoAsignado === 'izq' ? 'right center' : 'left center';
+                }
+
+                setTimeout(() => {
+                    nuevaTarjeta.classList.add('show');
+                    
+                    if (!esMovil) {
+                        const rectBloque = this.getBoundingClientRect();
+                        const rectMapa = this.parentElement.getBoundingClientRect();
+                        const offsetTop = (rectBloque.top - rectMapa.top) + (rectBloque.height / 2) - 100; 
+                        nuevaTarjeta.style.top = `${Math.max(0, offsetTop)}px`; 
+                    }
+                }, 10);
+
+                const btnCerrar = document.getElementById('btn-cerrar-tarjeta');
+                if (btnCerrar) {
+                    btnCerrar.addEventListener('click', function(e) {
+                        e.stopPropagation(); 
+                        nuevaTarjeta.classList.remove('show');
+                        bloques.forEach(b => b.classList.remove('active'));
+                        setTimeout(() => colMovil.innerHTML = '', 300);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
